@@ -4,10 +4,16 @@ import Search from "./components/Search";
 import Unit from "./components/Unit";
 import { useEffect, useState } from "react";
 import Weather from "./types/Weather";
+import MyError from "./types/MyError";
 
 function App() {
   const [currLocation, setCurrLocation] = useState("");
-  const [data, setData] = useState<Weather>({} as Weather);
+  const [data, setData] = useState<
+    Weather | MyError | GeolocationPositionError
+  >({
+    cod: "500",
+    message: "server error",
+  } as MyError);
   const [units, setUnits] = useState("metric");
   const [lat, setLat] = useState(0);
   const [lon, setLon] = useState(0);
@@ -24,7 +30,8 @@ function App() {
         : `https://api.openweathermap.org/data/2.5/weather?q=${currLocation}&appid=b1b15e88fa797225412429c1c50c122a1&units=${units}`;
     const res = await fetch(url);
     const json = await res.json();
-    setData(json);
+    if (json.cod === "200") return setData(json as Weather);
+    setData(json as MyError);
     // let status = json.cod;
     console.log({ json });
   };
@@ -50,14 +57,17 @@ function App() {
           return getData();
         },
         // Error callback function
-        (error) => {
-          // Handle errors, e.g. user denied location sharing permissions
-          console.error("Error getting user location:", error);
+        (error: GeolocationPositionError) => {
+          return setData(error as GeolocationPositionError);
         }
       );
     } else {
       // Geolocation is not supported by the browser
       console.error("Geolocation is not supported by this browser.");
+      return setData({
+        cod: 1,
+        message: "Geolocation is not supported by this browser.",
+      } as MyError);
     }
   }, [lat, lon]); //מבצע טעינה ברגע שיש מיקום שמתקבל בטעינת הדף
 
