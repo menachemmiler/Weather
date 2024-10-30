@@ -14,17 +14,18 @@ function App() {
 
   const getData = async () => {
     // בדוק אם יש מיקום מוגדר (או לפי שם או לפי קואורדינטות)
-    if ((!lat && !lon && currLocation === "") || !units) return;
+    if ((!lat || !lon) && currLocation === "") return;
 
+    //אם המשתמש חיפש לפי עיר יש לזה העדפה גם אם יש לנו את המיקום הגיאוגרפי שלו
+    //אחרת אנחנו מחפשים לפי המיקום שלו
     const url =
-      lat && lon && currLocation == ""
+      currLocation == ""
         ? `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=b1b15e88fa797225412429c1c50c122a1&units=${units}`
         : `https://api.openweathermap.org/data/2.5/weather?q=${currLocation}&appid=b1b15e88fa797225412429c1c50c122a1&units=${units}`;
     const res = await fetch(url);
     const json = await res.json();
     setData(json);
-    let status = json.cod;
-    alert(status);
+    // let status = json.cod;
     console.log({ json });
   };
 
@@ -43,7 +44,7 @@ function App() {
           longitude = position.coords.longitude;
 
           // Do something with the location data, e.g. display on a map
-          console.log(`Latitude: ${latitude}, longitude: ${longitude}`);
+          // console.log(`Latitude: ${latitude}, longitude: ${longitude}`);
           setLat(latitude);
           setLon(longitude);
           return getData();
@@ -58,7 +59,7 @@ function App() {
       // Geolocation is not supported by the browser
       console.error("Geolocation is not supported by this browser.");
     }
-  }, [lat, lon]);//מבצע טעינה ברגע שיש מיקום שמתקבל בטעינת הדף 
+  }, [lat, lon]); //מבצע טעינה ברגע שיש מיקום שמתקבל בטעינת הדף
 
   //אחראי על טעינת השינויים של המיקום\ שיטת מידה
   useEffect(() => {
