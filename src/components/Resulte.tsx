@@ -9,7 +9,7 @@ const Resulte = ({ data }: ResultePrpops) => {
   if (data.main) {
     return (
       <div className="resulte">
-        <div className="fullWidth">123 city {data.name}</div>
+        <div className="fullWidth">city {data.name}</div>
         <div className="fullWidth">description {data.weather[0].description}</div>
         <div className="fullWidth">temp {data.main.temp}</div>
         <div className="fullWidth">title {data.weather[0].main}</div>
